@@ -16,7 +16,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: "*" }));
+app.use(
+  cors({
+    origin:
+      "https://prepmyweek-frontend-fqc6yiw1f-benjamin-farthings-projects.vercel.app",
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.use("/api/users", usersRouter);
