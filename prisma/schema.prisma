@@ -1,0 +1,163 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator default {
+  provider = "prisma-client-js"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum StoreSection {
+  DAIRY
+  BEVERAGE
+  DELI
+  BREAKFAST
+  MEAT_SEAFOOD
+  BREAD
+  CHEESE
+  BAKING
+  CANNED
+  DRY_GOOD
+  SNACK
+  PRODUCE
+  FROZEN
+  INTERNATIONAL
+  SPICES
+  OTHER
+}
+
+enum Course {
+  BREAKFAST
+  LUNCH
+  DINNER
+}
+
+enum RecipeStatus {
+  pending
+  approved
+  rejected
+}
+
+enum FeedbackType {
+  Bug
+  FeatureRequest
+  StoreRequest
+  Other
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  name        String?
+  password    String
+  isAdmin     Boolean @default(false)
+  recipes     Recipe[]
+  currentPrep CurrentPrep?
+  pastPreps   PastPrep[]
+  feedbacks   Feedback[]
+  createdAt   DateTime     @default(now())
+}
+
+model Recipe {
+  id           Int                @id @default(autoincrement())
+  title        String
+  author       String?
+  prepTime     Int?
+  cookTime     Int?
+  course       Course?
+  servings     Int?
+  description  String?
+  instructions String
+  imageUrl     String?
+  user         User               @relation(fields: [userId], references: [id])
+  userId       Int
+  ingredients  RecipeIngredient[]
+  recipeStores RecipeStore[]
+  pastPreps    PastPrepRecipe[]
+  status       RecipeStatus       @default(pending)
+  createdAt    DateTime           @default(now())
+}
+
+model Ingredient {
+  id          Int                @id @default(autoincrement())
+  name        String             @unique
+  createdAt   DateTime           @default(now())
+  recipes     RecipeIngredient[]
+}
+
+model RecipeIngredient {
+  id           Int           @id @default(autoincrement())
+  recipeId     Int
+  ingredientId Int
+  quantity     Float
+  unit         String?
+  storeSection StoreSection?
+  isOptional   Boolean       @default(false)
+  preparation  String?
+  recipe       Recipe        @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient   Ingredient    @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+}
+
+model GroceryStore {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  logoUrl     String?
+  recipeStore RecipeStore[]
+}
+
+model RecipeStore {
+  id       Int          @id @default(autoincrement())
+  recipeId Int
+  storeId  Int
+  recipe   Recipe       @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  store    GroceryStore @relation(fields: [storeId], references: [id])
+
+  @@unique([recipeId, storeId])
+}
+
+model CurrentPrep {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+  recipeIds String[] // store as array of Recipe IDs
+  createdAt DateTime @default(now())
+}
+
+model PastPrep {
+  id        Int               @id @default(autoincrement())
+  name      String
+  user      User              @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime          @default(now())
+  recipes   PastPrepRecipe[]
+}
+
+model PastPrepRecipe {
+  pastPrepId Int
+  recipeId   Int
+
+  pastPrep   PastPrep @relation(fields: [pastPrepId], references: [id], onDelete: Cascade)
+  recipe     Recipe   @relation(fields: [recipeId], references: [id])
+
+  @@id([pastPrepId, recipeId])
+}
+
+model Feedback {
+  id        Int          @id @default(autoincrement())
+  user      User         @relation(fields: [userId], references: [id])
+  userId    Int
+  type      FeedbackType
+  message   String
+  createdAt DateTime     @default(now())
+}
