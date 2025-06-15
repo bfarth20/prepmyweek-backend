@@ -18,8 +18,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(
   cors({
-    origin:
-      "https://prepmyweek-frontend-fqc6yiw1f-benjamin-farthings-projects.vercel.app",
+    origin: ["https://prepmyweek.com", "https://www.prepmyweek.com"],
     credentials: true,
   })
 );
