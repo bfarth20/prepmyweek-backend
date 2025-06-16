@@ -9,7 +9,7 @@ import currentPrepRouter from "./routes/currentPrep.js";
 import pastPrepRoutes from "./routes/pastpreps/index.js";
 import adminRoutes from "./routes/admin.js";
 import feedbackRoutes from "./routes/feedback.js";
-import forgotPasswordRouter from "./forgotPassword.js";
+import forgotPasswordRouter from "./routes/forgotPassword.js";
 import { ZodError } from "zod";
 
 dotenv.config();
