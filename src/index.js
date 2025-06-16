@@ -20,9 +20,9 @@ const PORT = process.env.PORT || 3000;
 app.use(
   cors({
     origin: [
-      "http://localhost:3001", // local dev frontend
       "https://prepmyweek.com",
       "https://www.prepmyweek.com",
+      "http://localhost:3001", // local dev frontend
     ],
     credentials: true,
   })
