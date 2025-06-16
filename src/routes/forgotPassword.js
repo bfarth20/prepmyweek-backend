@@ -1,7 +1,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { randomUUID } from "crypto";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 
 const router = express.Router();
 const prisma = new PrismaClient();
