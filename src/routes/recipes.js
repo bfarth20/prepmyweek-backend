@@ -432,6 +432,9 @@ router.put("/:id", requireUser, async (req, res) => {
       where: { id: recipeId },
     });
 
+    console.log("User trying to edit:", req.user);
+    console.log("Recipe owner:", existing.userId);
+
     if (
       !existing ||
       (existing.userId !== req.user.userId && !req.user.isAdmin)
