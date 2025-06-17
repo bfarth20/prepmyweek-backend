@@ -2,6 +2,7 @@ import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
+import sendResetEmail from "../utils/sendEmail.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -40,7 +41,7 @@ router.post("/forgot-password", async (req, res) => {
 
     // Log reset link (replace with email sending later)
     const resetLink = `${process.env.BASE_URL}/reset-password?token=${token}`;
-    console.log(`Password reset link for ${email}: ${resetLink}`);
+    await sendResetEmail(email, resetLink);
 
     res.json({
       message:
