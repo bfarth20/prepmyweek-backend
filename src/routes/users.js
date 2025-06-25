@@ -60,6 +60,10 @@ router.post("/", async (req, res) => {
       },
     });
 
+    const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
     res.status(201).json({
       message: "User created successfully",
       user: {
