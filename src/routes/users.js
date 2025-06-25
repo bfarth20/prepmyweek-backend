@@ -66,6 +66,7 @@ router.post("/", async (req, res) => {
 
     res.status(201).json({
       message: "User created successfully",
+      token,
       user: {
         id: newUser.id,
         email: newUser.email,
