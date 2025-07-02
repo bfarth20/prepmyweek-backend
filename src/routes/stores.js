@@ -76,9 +76,30 @@ router.get("/:storeId/recipes", async (req, res) => {
           some: { storeId },
         },
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        imageUrl: true,
+        prepTime: true,
+        cookTime: true,
+        servings: true,
+        course: true,
+        isVegetarian: true,
+        createdAt: true, // <-- Add this here
         ingredients: {
-          include: { ingredient: true },
+          select: {
+            ingredientId: true,
+            quantity: true,
+            unit: true,
+            storeSection: true,
+            isOptional: true,
+            ingredient: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
         },
       },
       skip,
@@ -93,6 +114,8 @@ router.get("/:storeId/recipes", async (req, res) => {
       servings: r.servings,
       ingredientCount: r.ingredients.length,
       course: r.course,
+      isVegetarian: r.isVegetarian,
+      createdAt: r.createdAt,
       ingredients: r.ingredients.map((ri) => ({
         id: ri.ingredientId,
         name: ri.ingredient.name,
