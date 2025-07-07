@@ -32,7 +32,7 @@ export const createRecipeSchema = z.object({
     })
     .min(0, "Cook time cannot be negative"),
   servings: z
-    .union([z.string(), z.null(), z.undefined()])
+    .union([z.string(), z.number(), z.null(), z.undefined()])
     .transform((val) => {
       if (val === null || val === undefined || val === "") return undefined;
       return Number(val);
@@ -43,7 +43,7 @@ export const createRecipeSchema = z.object({
           code: z.ZodIssueCode.custom,
           message: "Servings is a required field",
         });
-        return; // stop further checks
+        return;
       }
       if (typeof val !== "number" || isNaN(val)) {
         ctx.addIssue({
