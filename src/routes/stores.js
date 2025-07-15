@@ -55,6 +55,7 @@ router.get("/:storeId/recipes", async (req, res) => {
   const storeId = parseInt(req.params.storeId);
   const page = req.query.page ? parseInt(req.query.page) : undefined;
   const limit = req.query.limit ? parseInt(req.query.limit) : undefined;
+  const search = req.query.search ?? "";
 
   const skip = page && limit ? (page - 1) * limit : undefined;
 
