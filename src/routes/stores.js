@@ -66,6 +66,10 @@ router.get("/:storeId/recipes", async (req, res) => {
         recipeStores: {
           some: { storeId },
         },
+        title: {
+          contains: search, // <-- new search filter param, case-insensitive by default
+          mode: "insensitive",
+        },
       },
     });
 
