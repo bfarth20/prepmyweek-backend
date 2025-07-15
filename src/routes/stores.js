@@ -72,10 +72,20 @@ router.get("/:storeId/recipes", async (req, res) => {
 
     // Add search condition if search is non-empty
     if (search) {
-      baseWhere.title = {
-        contains: search,
-        mode: "insensitive",
-      };
+      baseWhere.OR = [
+        {
+          title: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          instructions: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
     }
 
     // Add filter condition
