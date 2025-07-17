@@ -95,6 +95,10 @@ router.get("/:storeId/recipes", async (req, res) => {
       baseWhere.course = "DINNER";
     } else if (filter === "lunch") {
       baseWhere.course = "LUNCH";
+    } else if (filter === "breakfast") {
+      baseWhere.course = "BREAKFAST";
+    } else if (filter === "snack") {
+      baseWhere.course = "SNACK_SIDE";
     }
     // "all" means no additional filter
 
