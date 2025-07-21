@@ -38,10 +38,20 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: errorMessages.join(" ") });
   }
 
-  const { name, email, password, region, preferredStore } = parseResult.data;
+  let { name, email, password, region, preferredStore } = parseResult.data;
+
+  email = email.trim().toLowerCase();
 
   try {
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        email: {
+          equals: email,
+          mode: "insensitive",
+        },
+      },
+    });
+
     if (existingUser) {
       return res
         .status(409)
@@ -88,8 +98,15 @@ router.post("/login", async (req, res) => {
   console.log("Login attempt:", req.body);
 
   try {
-    const user = await prisma.user.findUnique({
-      where: { email },
+    email = email.trim().toLowerCase();
+
+    const user = await prisma.user.findFirst({
+      where: {
+        email: {
+          equals: email,
+          mode: "insensitive",
+        },
+      },
     });
 
     if (!user) {
