@@ -322,7 +322,7 @@ router.delete("/favorites/:recipeId", requireUser, async (req, res) => {
 //DELETE USER ROUTE
 
 router.delete("/delete-account", requireUser, async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.userId;
 
   try {
     // Delete current prep if it exists
