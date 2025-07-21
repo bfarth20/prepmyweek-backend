@@ -319,4 +319,44 @@ router.delete("/favorites/:recipeId", requireUser, async (req, res) => {
   }
 });
 
+//DELETE USER ROUTE
+
+router.delete("/delete-account", requireUser, async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    // Delete current prep if it exists
+    await prisma.currentPrep.deleteMany({
+      where: { userId },
+    });
+
+    // Delete all past preps (and cascade delete their PastPrepRecipes)
+    await prisma.pastPrep.deleteMany({
+      where: { userId },
+    });
+
+    // Clear user's favorite recipes (many-to-many relation)
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        favoriteRecipes: {
+          set: [],
+        },
+      },
+    });
+
+    // Now delete the user
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    res
+      .status(200)
+      .json({ message: "Account and associated data deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting user account:", error);
+    res.status(500).json({ error: "Failed to delete account." });
+  }
+});
+
 export default router;
