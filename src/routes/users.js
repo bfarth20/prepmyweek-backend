@@ -93,7 +93,7 @@ router.post("/", async (req, res) => {
 
 // User login
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  let { email, password } = req.body;
 
   console.log("Login attempt:", req.body);
 
