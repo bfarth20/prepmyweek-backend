@@ -390,4 +390,59 @@ router.patch("/preferred-store", requireUser, async (req, res) => {
   }
 });
 
+//GET custom stores from user
+router.get("/custom-stores", requireUser, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { personalizedStoreNames: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({ personalizedStoreNames: user.personalizedStoreNames || {} });
+  } catch (error) {
+    console.error("Failed to fetch personalized store names:", error);
+    res.status(500).json({ error: "Failed to fetch personalized store names" });
+  }
+});
+
+//Update the user's custom store names
+router.put("/custom-stores", requireUser, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { personalizedStoreNames } = req.body;
+
+    // Basic validation: must be an object
+    if (
+      !personalizedStoreNames ||
+      typeof personalizedStoreNames !== "object" ||
+      Array.isArray(personalizedStoreNames)
+    ) {
+      return res.status(400).json({
+        error:
+          "Invalid personalizedStoreNames: expected a JSON object mapping store IDs to names.",
+      });
+    }
+
+    // Update the user record with new personalized store names
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { personalizedStoreNames },
+      select: { personalizedStoreNames: true },
+    });
+
+    res.json({ personalizedStoreNames: updatedUser.personalizedStoreNames });
+  } catch (error) {
+    console.error("Failed to update personalized store names:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to update personalized store names" });
+  }
+});
+
 export default router;
