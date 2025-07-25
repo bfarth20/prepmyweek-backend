@@ -359,4 +359,35 @@ router.delete("/delete-account", requireUser, async (req, res) => {
   }
 });
 
+//Update user's preferred Store
+router.patch("/preferred-store", requireUser, async (req, res) => {
+  const { userId } = req.user;
+  const { preferredStore } = req.body;
+
+  if (!preferredStore || typeof preferredStore !== "string") {
+    return res.status(400).json({ error: "Invalid or missing store name." });
+  }
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { preferredStore },
+    });
+
+    res.status(200).json({
+      message: "Preferred store updated successfully",
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        region: updatedUser.region,
+        preferredStore: updatedUser.preferredStore,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating preferred store:", error);
+    res.status(500).json({ error: "Failed to update preferred store" });
+  }
+});
+
 export default router;
