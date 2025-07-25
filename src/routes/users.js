@@ -406,9 +406,9 @@ router.get("/custom-stores", requireUser, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    console.log("User custom stores:", user.customStoreNames);
+    console.log("User personalized stores:", user.personalizedStoreNames);
 
-    res.json({ personalizedStoreNames: user.personalizedStoreNames || {} });
+    res.json(user.personalizedStoreNames || []);
   } catch (error) {
     console.error("Failed to fetch personalized store names:", error);
     res.status(500).json({ error: "Failed to fetch personalized store names" });
