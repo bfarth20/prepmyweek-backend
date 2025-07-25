@@ -63,7 +63,12 @@ export default async function sendResetEmail(toEmail, resetLink) {
               <p>Hello,</p>
               <p>You requested a password reset for your PrepMyWeek account.</p>
               <p>Click the button below to reset your password. This link will expire in 15 minutes.</p>
-              <a href="${resetLink}" class="button">Reset Password</a>
+              <a href="${resetLink}" 
+   style="display:inline-block;margin-top:16px;padding:12px 20px;
+          background-color:#d95c23;color:#ffffff !important;
+          text-decoration:none;border-radius:4px;font-weight:bold;">
+   Reset Password
+</a>
               <p>If you didn’t request this, you can safely ignore it.</p>
               <div class="footer">
                 &copy; 2025 PrepMyWeek Inc. All rights reserved.<br />
