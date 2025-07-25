@@ -392,6 +392,8 @@ router.patch("/preferred-store", requireUser, async (req, res) => {
 
 //GET custom stores from user
 router.get("/custom-stores", requireUser, async (req, res) => {
+  console.log("GET /users/custom-stores called");
+  console.log("User ID from token:", req.user.userId);
   try {
     const userId = req.user.userId;
 
@@ -403,6 +405,8 @@ router.get("/custom-stores", requireUser, async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+
+    console.log("User custom stores:", user.customStoreNames);
 
     res.json({ personalizedStoreNames: user.personalizedStoreNames || {} });
   } catch (error) {
