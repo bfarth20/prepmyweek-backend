@@ -106,16 +106,18 @@ model Ingredient {
 }
 
 model RecipeIngredient {
-  id           Int           @id @default(autoincrement())
-  recipeId     Int
-  ingredientId Int
-  quantity     Float
-  unit         String?
-  storeSection StoreSection?
-  isOptional   Boolean       @default(false)
-  preparation  String?
-  recipe       Recipe        @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  ingredient   Ingredient    @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  id                 Int           @id @default(autoincrement())
+  recipeId           Int
+  ingredientId       Int
+  quantity           Float
+  unit               String?
+  normalizedQuantity Float?      
+  normalizedUnit     String? 
+  storeSection       StoreSection?
+  isOptional         Boolean       @default(false)
+  preparation        String?
+  recipe             Recipe        @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient         Ingredient    @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
 }
 
 model GroceryStore {
