@@ -69,7 +69,7 @@ export function aggregateIngredients(recipes, options = {}) {
 
       if (sectionMap.has(key)) {
         const existing = sectionMap.get(key);
-        existing.normalizedQuantity += quantity;
+        existing.normalizedQuantity += Number(quantity);
       } else {
         sectionMap.set(key, {
           name,
