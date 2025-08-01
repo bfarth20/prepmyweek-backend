@@ -1,18 +1,28 @@
 // Volume conversion factors to tablespoons (tbsp)
 export const volumeConversionToTbsp = {
+  // US customary
   tsp: 1 / 3,
   tbsp: 1,
-  cup: 16,
   "fl oz": 2,
+  cup: 16,
   pint: 32,
   quart: 64,
   gallon: 256,
+
+  // Metric (1 tbsp = 14.7868 ml)
+  ml: 1 / 14.7868, // ~0.0676
+  l: 1000 / 14.7868, // ~67.628
 };
 
 // Weight conversion factors to ounces (oz)
 export const weightConversionToOz = {
+  // US customary
   oz: 1,
   lb: 16,
+
+  // Metric (1 oz = 28.3495 g)
+  g: 1 / 28.3495, // ~0.03527
+  kg: 1000 / 28.3495, // ~35.274
 };
 
 // Define which units are count-based (non-convertible)
@@ -30,6 +40,16 @@ const countUnits = new Set([
 // Conversion constants for metric display
 const tbspToMl = 14.7868;
 const ozToG = 28.3495;
+
+function roundToFraction(value, unit) {
+  const fractions = {
+    tbsp: 0.25,
+    tsp: 0.125,
+    cup: 0.25, // optional, rarely needed but makes it tidy
+  };
+  const step = fractions[unit] || 0.01;
+  return Math.round(value / step) * step;
+}
 
 // Determine unit type
 export function getUnitType(unit) {
@@ -87,7 +107,7 @@ export function convertTbspToBestUnit(amount, preferMetric = false) {
   for (const { unit, factor } of units) {
     if (amount >= factor) {
       return {
-        amount: Math.round((amount / factor) * 100) / 100, // round to 2 decimals
+        amount: roundToFraction(amount / factor, unit),
         unit,
       };
     }
