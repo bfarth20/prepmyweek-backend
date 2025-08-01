@@ -18,10 +18,28 @@ const sendResponse = (res, status, payload) => {
 };
 
 export const getRecipeById = async (req, res) => {
-  // Parse the recipe ID from the request parameters
   const recipeId = parseInt(req.params.id);
 
+  let preferMetric = false;
+
   try {
+    // Use preferMetric from query param if provided
+    if (req.query.preferMetric !== undefined) {
+      preferMetric = req.query.preferMetric === "true";
+    } else {
+      // Otherwise fallback to user preference from DB
+      const userId = req.user?.userId;
+      if (userId) {
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { preferMetric: true },
+        });
+        preferMetric = user?.preferMetric ?? false;
+      }
+    }
+
+    console.log("Effective preferMetric value:", preferMetric);
+
     // Fetch recipe from the database with full associations
     const recipe = await prisma.recipe.findUnique({
       where: { id: recipeId },
@@ -84,11 +102,17 @@ export const getRecipeById = async (req, res) => {
         try {
           const unitType = getUnitType(unitForConversion);
           if (unitType === "volume") {
-            const converted = convertTbspToBestUnit(quantityForConversion);
+            const converted = convertTbspToBestUnit(
+              quantityForConversion,
+              preferMetric
+            );
             displayQuantity = converted.amount;
             displayUnit = converted.unit;
           } else if (unitType === "weight") {
-            const converted = convertOzToBestUnit(quantityForConversion);
+            const converted = convertOzToBestUnit(
+              quantityForConversion,
+              preferMetric
+            );
             displayQuantity = converted.amount;
             displayUnit = converted.unit;
           }

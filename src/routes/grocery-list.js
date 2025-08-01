@@ -8,11 +8,24 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { recipeIds } = req.body;
+    const { recipeIds, preferMetric: preferMetricFromBody } = req.body;
     if (!Array.isArray(recipeIds) || recipeIds.length === 0) {
       return res
         .status(400)
         .json({ error: "recipeIds must be a non-empty array" });
+    }
+
+    const userId = req.user?.userId;
+    let preferMetric = false;
+
+    if (typeof preferMetricFromBody === "boolean") {
+      preferMetric = preferMetricFromBody;
+    } else if (userId) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { preferMetric: true },
+      });
+      preferMetric = user?.preferMetric ?? false;
     }
 
     // Fetch recipes with ingredients
@@ -33,8 +46,8 @@ router.post("/", async (req, res) => {
         .json({ error: "No recipes found for provided IDs" });
     }
 
-    // Aggregate ingredients using your existing logic
-    const groceryList = aggregateIngredients(recipes);
+    // Aggregate ingredients with preferMetric flag
+    const groceryList = aggregateIngredients(recipes, { preferMetric });
     const groceryListObj = Object.fromEntries(groceryList);
 
     res.json({ groceryList: groceryListObj });

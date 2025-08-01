@@ -27,6 +27,10 @@ const countUnits = new Set([
   "pinch",
 ]);
 
+// Conversion constants for metric display
+const tbspToMl = 14.7868;
+const ozToG = 28.3495;
+
 // Determine unit type
 export function getUnitType(unit) {
   unit = unit.toLowerCase();
@@ -55,7 +59,24 @@ export function convertWeightToOz(amount, unit) {
 }
 
 // Convert from base volume (tbsp) back to best display unit
-export function convertTbspToBestUnit(amount) {
+export function convertTbspToBestUnit(amount, preferMetric = false) {
+  if (preferMetric) {
+    let mlAmount = amount * tbspToMl;
+    if (mlAmount < 10) {
+      mlAmount = Math.round(mlAmount * 10) / 10; // round to 1 decimal place, no big rounding
+    } else {
+      mlAmount = Math.round(mlAmount / 10) * 10; // round to nearest 10 ml
+    }
+    // Ensure minimum display amount for very small non-zero values
+    if (mlAmount === 0 && amount > 0) {
+      mlAmount = 1;
+    }
+    return {
+      amount: mlAmount,
+      unit: "ml",
+    };
+  }
+
   // Units sorted largest to smallest for display
   const units = [
     { unit: "cup", factor: volumeConversionToTbsp["cup"] },
@@ -79,7 +100,22 @@ export function convertTbspToBestUnit(amount) {
 }
 
 // Convert from base weight (oz) back to best display unit
-export function convertOzToBestUnit(amount) {
+export function convertOzToBestUnit(amount, preferMetric = false) {
+  if (preferMetric) {
+    const grams = Math.round((amount * ozToG) / 5) * 5; // round to nearest 5g
+    if (grams >= 1000) {
+      return {
+        amount: Math.round((grams / 1000) * 100) / 100, // 2 decimals kg
+        unit: "kg",
+      };
+    }
+    return {
+      amount: grams,
+      unit: "g",
+    };
+  }
+
+  // Units sorted largest to smallest for display (imperial)
   const units = [
     { unit: "lb", factor: weightConversionToOz["lb"] },
     { unit: "oz", factor: weightConversionToOz["oz"] },
@@ -99,10 +135,14 @@ export function convertOzToBestUnit(amount) {
 export function pluralizeUnit(unit, amount) {
   if (!unit) return "";
 
-  const isPlural = Math.abs(amount - 1) > 0.01;
-
-  // Use consistent casing (optional, depending on your data hygiene)
   const normalized = unit.toLowerCase();
+
+  // Skip pluralization for metric units
+  if (["ml", "g"].includes(normalized)) {
+    return unit; // always singular, no "s"
+  }
+
+  const isPlural = Math.abs(amount - 1) > 0.01;
 
   // Map of known plural forms
   const customPlurals = {

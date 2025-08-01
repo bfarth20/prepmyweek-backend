@@ -14,6 +14,7 @@ async function normalizeRecipeIngredients() {
     const { id, quantity, unit } = ri;
 
     if (!unit || quantity == null) continue;
+    if (ri.normalizedQuantity != null && ri.normalizedUnit != null) continue;
 
     let normalizedQuantity = quantity;
     let normalizedUnit = unit;

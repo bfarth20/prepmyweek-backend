@@ -149,6 +149,7 @@ router.get("/me", requireUser, async (req, res) => {
         isAdmin: true,
         region: true,
         preferredStore: true,
+        preferMetric: true,
         walkthroughEnabled: true,
         recipes: {
           select: {
@@ -446,6 +447,37 @@ router.put("/custom-stores", requireUser, async (req, res) => {
     res
       .status(500)
       .json({ error: "Failed to update personalized store names" });
+  }
+});
+
+// PUT /users/preferMetric
+router.put("/preferMetric", requireUser, async (req, res) => {
+  const userId = req.user.id;
+  const { preferMetric } = req.body;
+
+  if (typeof preferMetric !== "boolean") {
+    return res.status(400).json({ error: "Invalid preferMetric value" });
+  }
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { preferMetric },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        preferMetric: true,
+        walkthroughEnabled: true,
+        isAdmin: true,
+        preferredStore: true,
+      },
+    });
+
+    res.json(updatedUser);
+  } catch (err) {
+    console.error("Error updating preferMetric:", err);
+    res.status(500).json({ error: "Failed to update user preference" });
   }
 });
 

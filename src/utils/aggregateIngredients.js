@@ -37,7 +37,13 @@ function formatSectionName(raw) {
  * @param {Array} recipes - Array of recipes with normalized ingredients
  * @returns {Map<string, Array>} Map keyed by storeSection with array of aggregated ingredients
  */
-export function aggregateIngredients(recipes) {
+function getLastWord(str) {
+  const words = str.trim().toLowerCase().split(" ");
+  return words[words.length - 1];
+}
+
+export function aggregateIngredients(recipes, options = {}) {
+  const { preferMetric = false } = options;
   const grouped = new Map();
 
   for (const recipe of recipes) {
@@ -75,7 +81,6 @@ export function aggregateIngredients(recipes) {
     }
   }
 
-  // Now convert normalizedQuantity to best units and pluralize
   const result = new Map();
 
   for (const [section, ingredientsMap] of grouped.entries()) {
@@ -90,11 +95,17 @@ export function aggregateIngredients(recipes) {
       try {
         const unitType = getUnitType(rawUnit);
         if (unitType === "volume") {
-          const converted = convertTbspToBestUnit(normalizedQuantity);
+          const converted = convertTbspToBestUnit(
+            normalizedQuantity,
+            preferMetric
+          );
           displayQuantity = converted.amount;
           displayUnit = converted.unit;
         } else if (unitType === "weight") {
-          const converted = convertOzToBestUnit(normalizedQuantity);
+          const converted = convertOzToBestUnit(
+            normalizedQuantity,
+            preferMetric
+          );
           displayQuantity = converted.amount;
           displayUnit = converted.unit;
         }
@@ -112,6 +123,13 @@ export function aggregateIngredients(recipes) {
         unit: pluralUnit,
       });
     }
+
+    // **Sort arr alphabetically by last word in ingredient name**
+    arr.sort((a, b) => {
+      const lastWordA = getLastWord(a.name);
+      const lastWordB = getLastWord(b.name);
+      return lastWordA.localeCompare(lastWordB);
+    });
 
     result.set(formatSectionName(section), arr);
   }

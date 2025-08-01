@@ -14,7 +14,20 @@ const prisma = new PrismaClient();
 // GET /current-prep
 router.get("/", requireUser, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        preferMetric: true,
+      },
+    });
+
+    const preferMetric = user?.preferMetric ?? false;
 
     const currentPrep = await prisma.currentPrep.findUnique({
       where: { userId },
@@ -81,11 +94,17 @@ router.get("/", requireUser, async (req, res) => {
         try {
           const unitType = getUnitType(unitForConversion);
           if (unitType === "volume") {
-            const converted = convertTbspToBestUnit(quantityForConversion);
+            const converted = convertTbspToBestUnit(
+              quantityForConversion,
+              preferMetric
+            );
             displayQuantity = converted.amount;
             displayUnit = converted.unit;
           } else if (unitType === "weight") {
-            const converted = convertOzToBestUnit(quantityForConversion);
+            const converted = convertOzToBestUnit(
+              quantityForConversion,
+              preferMetric
+            );
             displayQuantity = converted.amount;
             displayUnit = converted.unit;
           }

@@ -8,7 +8,17 @@ import {
 
 export const getPastPrepById = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { preferMetric: true },
+    });
+
+    const preferMetric = user?.preferMetric ?? false;
     const pastPrepId = parseInt(req.params.id, 10);
 
     const prep = await prisma.pastPrep.findFirst({
@@ -82,11 +92,17 @@ export const getPastPrepById = async (req, res) => {
         try {
           const unitType = getUnitType(unitForConversion);
           if (unitType === "volume") {
-            const converted = convertTbspToBestUnit(quantityForConversion);
+            const converted = convertTbspToBestUnit(
+              quantityForConversion,
+              preferMetric
+            );
             displayQuantity = converted.amount;
             displayUnit = converted.unit;
           } else if (unitType === "weight") {
-            const converted = convertOzToBestUnit(quantityForConversion);
+            const converted = convertOzToBestUnit(
+              quantityForConversion,
+              preferMetric
+            );
             displayQuantity = converted.amount;
             displayUnit = converted.unit;
           }

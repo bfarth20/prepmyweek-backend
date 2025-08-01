@@ -73,6 +73,7 @@ model User {
   walkthroughEnabled     Boolean              @default(true)
   favoriteRecipes        Recipe[]             @relation("UserFavoriteRecipes")
   personalizedStoreNames Json?
+  preferMetric           Boolean              @default(false)
   createdAt              DateTime             @default(now())
 }
 
