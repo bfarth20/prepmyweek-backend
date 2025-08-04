@@ -105,7 +105,7 @@ export function aggregateIngredients(recipes, options = {}) {
           displayQuantity = converted.amount;
           displayUnit = converted.unit;
         } else if (unitType === "weight") {
-          if (storeSection === sectionLabels.CANNED) {
+          if (storeSection === "CANNED") {
             // Force ounces display for canned goods
             displayQuantity = normalizedQuantity;
             displayUnit = "oz";
