@@ -481,7 +481,7 @@ router.put("/preferMetric", requireUser, async (req, res) => {
   }
 });
 
-app.get("/api/user/section-order", authenticateUser, async (req, res) => {
+router.get("/section-order", requireUser, async (req, res) => {
   const userId = req.user.id;
 
   const user = await prisma.user.findUnique({
@@ -492,7 +492,7 @@ app.get("/api/user/section-order", authenticateUser, async (req, res) => {
   res.json({ order: user?.grocerySectionOrder ?? null });
 });
 
-app.post("/api/user/section-order", authenticateUser, async (req, res) => {
+router.post("/section-order", requireUser, async (req, res) => {
   const userId = req.user.id;
   const { order } = req.body;
 
